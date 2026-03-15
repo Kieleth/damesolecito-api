@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+data/dsm/*.tif
+data/raw/
+shadow_map.html
+.env

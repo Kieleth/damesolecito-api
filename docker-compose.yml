@@ -1,0 +1,10 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8400:8000"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1

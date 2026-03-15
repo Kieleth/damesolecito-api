@@ -1,0 +1,13 @@
+project_slug: damesolecito
+
+services:
+  - name: api
+    port: 8400
+    domain: damesolecito.kieleth.com
+    network: host
+    health_path: /
+
+routes:
+  - path: /
+    upstream: api:8400
+    public: true

@@ -165,14 +165,8 @@ async def get_shadows(
         if (time_module_time() - cached_time) < CACHE_TTL:
             return JSONResponse(cached_result)
 
-    # Find DSM tile
-    dsm_path = _find_dsm(lat, lon)
-    if dsm_path is None:
-        raise HTTPException(
-            404,
-            "No DSM data available for this location. "
-            "Run fetch_dsm.py or place a LAZ-processed DSM in data/dsm/.",
-        )
+    # Find or fetch DSM tile on demand
+    dsm_path = _ensure_dsm(lat, lon)
 
     # Compute shadows (loads DSM at 1m upscaled resolution)
     result = compute_shadows_for_location(dsm_path, lat, lon, dt)
@@ -237,10 +231,7 @@ async def get_shadow_png(
     else:
         dt = datetime.now(timezone.utc)
 
-    dsm_path = _find_dsm(lat, lon)
-    if dsm_path is None:
-        raise HTTPException(404, "No DSM data available")
-
+    dsm_path = _ensure_dsm(lat, lon)
     result = compute_shadows_for_location(dsm_path, lat, lon, dt)
 
     # Create RGBA image: shadow = semi-transparent dark, sun = fully transparent

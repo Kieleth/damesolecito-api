@@ -53,14 +53,12 @@ def _cache_key(lat: float, lon: float, dt: datetime) -> str:
 def _find_dsm(lat: float, lon: float) -> Optional[Path]:
     """Find a DSM tile that covers the given location.
 
-    For now: returns the first DSM file found (works with 1 tile).
-    Future: spatial index lookup by tile bounds.
+    Returns None if no tile covers the point — caller should fetch on demand.
     """
     dsm_files = list(DSM_DIR.glob("*.tif"))
     if not dsm_files:
         return None
 
-    # Check which DSM file contains this point
     transformer = Transformer.from_crs("EPSG:4326", "EPSG:25830", always_xy=True)
     px, py = transformer.transform(lon, lat)
 
@@ -70,8 +68,7 @@ def _find_dsm(lat: float, lon: float) -> Optional[Path]:
             if bounds.left <= px <= bounds.right and bounds.bottom <= py <= bounds.top:
                 return dsm_path
 
-    # Fallback: return first file (for testing)
-    return dsm_files[0] if dsm_files else None
+    return None  # no tile covers this point — must fetch
 
 
 def _shadow_mask_to_geojson(
